@@ -1,0 +1,14 @@
+name: mlnx
+summary: MLNX repo
+maintainers:
+  - OmniVector Solutions <admin@omnivector.solutions>
+description: |
+  This charm provisions the mlnx repository.
+
+tags:
+  - infra
+
+series:
+  - focal
+
+subordinate: true
