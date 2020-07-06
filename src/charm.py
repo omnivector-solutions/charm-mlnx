@@ -9,29 +9,28 @@ from ops.main import main
 from ops.model import ActiveStatus
 
 
-def get_os_release_ctxt():
-    os_release_ctxt = {}
-    with open("/etc/os-release", 'r') as f:
-        for line in f.readlines():
-            os_release_ctxt[line.split("=")[0]] = line.split("=")[1]
-    return os_release_ctxt
-
 
 class MLNXCharm(CharmBase):
-
-    _ID = get_os_release_ctxt['ID']
-    _VERSION_ID = get_os_release_ctxt['VERSION_ID']
-
-    _MLNX_REPO = ("https://linux.mellanox.com/public/repo/"
-                  "mlnx_ofed/latest/{self._ID}{self._VERSION_ID}/"
-                  "mellanox_mlnx_ofed.list")
-    _APT_SOURCE_PATH = Path("/etc/apt/sources.list.d/mellanox_mlnx_ofed.list")
-
     def __init__(self, *args):
         super().__init__(*args)
         self.framework.observe(self.on.install, self._on_install)
         self.framework.observe(self.on.start, self._on_start)
 
+        self._ID = self.os_release_ctxt['ID']
+        self._VERSION_ID = self.os_release_ctxt['VERSION_ID']
+    
+        self._MLNX_REPO = ("https://linux.mellanox.com/public/repo/"
+                      "mlnx_ofed/latest/{self._ID}{self._VERSION_ID}/"
+                      "mellanox_mlnx_ofed.list")
+        self._APT_SOURCE_PATH = Path("/etc/apt/sources.list.d/mellanox_mlnx_ofed.list")
+
+    @property
+    def os_release_ctxt(self):
+        os_release_ctxt = {}
+        with open("/etc/os-release", 'r') as f:
+            for line in f.readlines():
+                os_release_ctxt[line.split("=")[0]] = line.split("=")[1]
+        return os_release_ctxt
 
     def _on_install(self, event):
         """Prepare for the installation of mlnx repo and packages."""

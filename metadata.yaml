@@ -12,4 +12,9 @@ series:
   - focal
   - bionic
 
+requires:
+  juju-info:
+    scope: container
+    interface: juju-info
+
 subordinate: true
