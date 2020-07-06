@@ -9,10 +9,22 @@ from ops.main import main
 from ops.model import ActiveStatus
 
 
+def get_os_release_ctxt():
+    os_release_ctxt = {}
+    with open("/etc/os-release", 'r') as f:
+        for line in f.readlines():
+            os_release_ctxt[line.split("=")[0]] = line.split("=")[1]
+    return os_release_ctxt
+
+
 class MLNXCharm(CharmBase):
 
+    _ID = get_os_release_ctxt['ID']
+    _VERSION_ID = get_os_release_ctxt['VERSION_ID']
+
     _MLNX_REPO = ("https://linux.mellanox.com/public/repo/"
-                  "mlnx_ofed/latest/ubuntu18.04/mellanox_mlnx_ofed.list")
+                  "mlnx_ofed/latest/{self._ID}{self._VERSION_ID}/"
+                  "mellanox_mlnx_ofed.list")
     _APT_SOURCE_PATH = Path("/etc/apt/sources.list.d/mellanox_mlnx_ofed.list")
 
     def __init__(self, *args):
